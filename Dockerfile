@@ -1,30 +1,26 @@
-# Dockerfile (diagnostic)
-FROM node:20-alpine
+# Dockerfile (stabil – Debian base)
+FROM node:20-bullseye-slim
+
+ENV NODE_ENV=production \
+    NPM_CONFIG_AUDIT=false \
+    NPM_CONFIG_FUND=false
+
+# Install build tools (aman untuk modul native; ringan)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ ca-certificates openssl \
+ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-ARG BUILD_ID=2025-10-29-DBG3
 
-# 1) Copy manifests
+# Copy manifests dulu (cache-friendly)
 COPY package.json ./
-COPY package-lock.json* ./
+COPY package-lock.json ./
 
-# 2) Print environment info & manifest
-RUN set -eux; \
-    node -v; npm -v; ls -la; \
-    echo "----- package.json -----"; cat package.json || true; echo "------------------------";
+# Instal strictly sesuai lockfile (deterministik)
+RUN npm ci --omit=dev
 
-# 3) Install deps (ci jika ada lock, else install) + dump log jika gagal
-RUN set -eux; \
-  if [ -f package-lock.json ]; then \
-    echo ">>> Using npm ci"; \
-    npm ci --omit=dev --no-audit --no-fund --ignore-scripts --loglevel=verbose \
-    || (echo ">>> npm ci failed. Dumping logs..." && ls -la /root/.npm/_logs || true && cat /root/.npm/_logs/*-debug-0.log || true && exit 1); \
-  else \
-    echo ">>> Using npm install"; \
-    npm install --omit=dev --no-audit --no-fund --ignore-scripts --loglevel=verbose \
-    || (echo ">>> npm install failed. Dumping logs..." && ls -la /root/.npm/_logs || true && cat /root/.npm/_logs/*-debug-0.log || true && exit 1); \
-  fi
-
-# 4) Copy source code
+# Baru copy source lain
 COPY . .
+
 EXPOSE 8080
 CMD ["npm","start"]
