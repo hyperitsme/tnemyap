@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>tnemyap — HTTP 402 Pay-Per-Request</title>
+<style>
+  :root{
+    --bg:#ffffff; --panel:#fafafa; --line:#e5e7eb; --text:#1b1b1b; --mut:#6b7280;
+    --accent:#5d3e84; --accent-2:#7a59a8; --shadow:0 8px 28px rgba(17,24,39,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans-serif,system-ui,Segoe UI,Arial}
+  a{color:var(--accent);text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px}
+  .nav{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
+  .brand{display:flex;gap:10px;align-items:center;font-weight:800;letter-spacing:.2px}
+  .brand img{height:28px;width:auto;display:block}
+  .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:999px}
+  .grid{display:grid;gap:16px}
+  .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:900px){.g-2,.g-3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  h1{font-size:28px;margin:10px 0 6px}
+  h2{font-size:18px;margin:0 0 8px}
+  .mut{color:var(--mut)}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+  button{
+    background:var(--accent);border:0;border-radius:12px;color:#fff;font-weight:800;
+    padding:12px 16px;cursor:pointer;transition:.18s transform, .18s box-shadow; box-shadow:0 6px 16px rgba(93,62,132,.25)
+  }
+  button:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(93,62,132,.28)}
+  button.ghost{background:#fff;border:1px solid var(--line);color:var(--accent);box-shadow:none}
+  input,select{width:100%;background:#fff;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .kpi{display:flex;gap:10px;align-items:center}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(93,62,132,.12)}
+  .footer{margin:40px 0 20px;color:var(--mut);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .hl{color:var(--accent)}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:20px 0}
+  pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);padding:12px;border-radius:12px;max-height:320px;overflow:auto}
+  .flow{position:relative;border:1px dashed var(--line);border-radius:12px;padding:12px;background:#fff}
+  dialog{border:none;border-radius:16px;padding:0;background:#fff;color:var(--text);max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+  .modal{padding:18px}
+  .grid-quote{display:grid;grid-template-columns:120px 1fr;gap:8px 12px}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#efe9f7;border:1px solid #e2d7f3;font-size:12px;color:#3b2b55}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <img src="/assets/logo.png" alt="tnemyap logo"/>
+        <span>tnemyap</span>
+      </div>
+      <div class="row">
+        <a class="pill" href="#" id="xOnly" title="X (Twitter)">X</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h1>HTTP <span class="hl">402</span> Pay-Per-Request Engine</h1>
+      <p class="mut">Your API answers with <span class="hl">402 Payment Required</span> and a quote; the client pays (USDC on Base), retries with proof, and receives the data.</p>
+      <div class="grid g-3" style="margin-top:12px">
+        <div class="flow"><h2>1) Request</h2><p class="mut">Client calls a protected endpoint.</p></div>
+        <div class="flow"><h2>2) 402 Quote</h2><p class="mut">Server returns X-402 headers (price, token, nonce, TTL).</p></div>
+        <div class="flow"><h2>3) Pay → Retry</h2><p class="mut">Wallet pays USDC → client retries with <code class="mono">X-402-Proof</code>.</p></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid g-2">
+      <div class="card">
+        <h2>Quick Test</h2>
+        <div class="row" style="margin-bottom:10px">
+          <div style="flex:1;min-width:240px">
+            <label class="mut">API Base URL</label>
+            <input id="apiBase" value="http://localhost:8080"/>
+          </div>
+          <div>
+            <label class="mut">Endpoint</label>
+            <select id="endpoint">
+              <option value="/v1/alpha-signal">/v1/alpha-signal</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom:10px">
+          <button id="btnCall">Call Protected</button>
+          <button class="ghost" id="btnHealth">Health</button>
+          <span class="kpi mut"><span class="dot" id="dot"></span><span id="status">Idle</span></span>
+        </div>
+        <pre id="out" class="mono">Output will appear here…</pre>
+      </div>
+
+      <div class="card">
+        <h2>Receipts (last 100)</h2>
+        <div class="row" style="margin-bottom:10px">
+          <button id="btnReceipts" class="ghost">Refresh</button>
+          <span class="mut">Reads <code>/admin/receipts</code> from your API.</span>
+        </div>
+        <pre id="receipts" class="mono">No data yet.</pre>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="card">
+      <h2>Developer Notes</h2>
+      <ul>
+        <li>Chain: <b>Base</b> (chainId <code>0x2105</code>) — Token: <b>USDC</b>.</li>
+        <li>Payment modal opens on <code>402</code>, then client retries with <code>X-402-Proof</code>.</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <span>© <span id="year"></span> tnemyap — pay-per-request</span>
+      <span class="mut">Social: X only</span>
+    </div>
+  </div>
+
+  <!-- 402 Payment Modal -->
+  <dialog id="payDlg">
+    <div class="modal">
+      <h2 style="margin:6px 0 4px">Payment Required</h2>
+      <p class="mut">Approve the payment below to continue.</p>
+      <div class="grid-quote">
+        <div>Price</div><div><span id="qPrice" class="badge"></span></div>
+        <div>Token</div><div><span id="qToken" class="mono"></span></div>
+        <div>Chain</div><div><span id="qChain" class="mono"></span></div>
+        <div>To</div><div><span id="qTo" class="mono"></span></div>
+        <div>Nonce</div><div><span id="qNonce" class="mono"></span></div>
+        <div>Expiry</div><div><span id="qExp" class="mono"></span></div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button id="btnPayMeta">Pay with MetaMask</button>
+        <button class="ghost" id="btnCancel">Cancel</button>
+      </div>
+      <pre id="payLog" class="mono" style="margin-top:10px;max-height:160px">Ready.</pre>
+    </div>
+  </dialog>
+
+<script>
+const $=(id)=>document.getElementById(id);
+const apiBase=$("apiBase"), endpoint=$("endpoint"), out=$("out"), receipts=$("receipts");
+const statusEl=$("status"), dot=$("dot"), year=$("year"); year.textContent=new Date().getFullYear();
+
+const dlg=$("payDlg");
+const qPrice=$("qPrice"), qToken=$("qToken"), qChain=$("qChain"), qTo=$("qTo"), qNonce=$("qNonce"), qExp=$("qExp"), payLog=$("payLog");
+
+$("btnHealth").onclick=async()=>{
+  setBusy(true,"Pinging /health…");
+  try{ const r=await fetch(join(apiBase.value,"/health")); out.textContent=await r.text(); }
+  catch(e){ out.textContent=String(e); }
+  setBusy(false);
+};
+$("btnReceipts").onclick=async()=>{
+  setBusy(true,"Loading receipts…");
+  try{ const r=await fetch(join(apiBase.value,"/admin/receipts")); receipts.textContent=JSON.stringify(await r.json(),null,2)||"[]"; }
+  catch(e){ receipts.textContent=String(e); }
+  setBusy(false);
+};
+$("btnCall").onclick=async()=>{
+  out.textContent=""; setBusy(true,"Calling protected endpoint…");
+  try{ const data=await x402Fetch(join(apiBase.value,endpoint.value)); out.textContent=pretty(data); }
+  catch(e){ out.textContent="Error: "+(e?.message||e); }
+  setBusy(false);
+};
+
+function setBusy(b,msg){ statusEl.textContent=msg||(b?"Working…":"Idle"); dot.style.opacity=b?1:.35; }
+function pretty(x){ return typeof x==="string"?x:JSON.stringify(x,null,2); }
+function join(base,path){ return base.replace(/\/+$/,"")+(path.startsWith("/")?"":"/")+path; }
+
+/* Fetch with 402 handling */
+async function x402Fetch(url,opts={}){
+  let res=await fetch(url,opts);
+  if(res.status!==402) return res.json();
+
+  const q={
+    price:res.headers.get("X-402-Price"),
+    chain:res.headers.get("X-402-Chain"),
+    tokenSymbol:res.headers.get("X-402-Token"),
+    tokenAddress:res.headers.get("X-402-TokenAddress"),
+    decimals:parseInt(res.headers.get("X-402-Decimals")||"6",10),
+    to:res.headers.get("X-402-Address"),
+    nonce:res.headers.get("X-402-Nonce"),
+    expiry:res.headers.get("X-402-Expiry"),
+  };
+  showQuote(q);
+
+  const txHash=await payWithMetaMask(q).catch(e=>{ logPay("❌ "+(e?.message||e)); throw e; });
+  logPay("✅ Paid: "+txHash);
+
+  const res2=await fetch(url,{...opts,headers:{...(opts.headers||{}),"X-402-Proof":`tx=${txHash}; nonce=${q.nonce}`}});
+  if(!res2.ok) throw new Error("Retry failed: "+res2.status+" "+(await res2.text()));
+  return res2.json();
+}
+
+function showQuote(q){
+  qPrice.textContent=q.price||"-";
+  qToken.textContent=`${q.tokenSymbol} (${fmtAddr(q.tokenAddress)})`;
+  qChain.textContent=q.chain||"-"; qTo.textContent=q.to||"-"; qNonce.textContent=q.nonce||"-"; qExp.textContent=q.expiry||"-";
+  payLog.textContent="Ready."; dlg.showModal();
+}
+$("btnCancel").onclick=()=>dlg.close();
+
+function fmtAddr(a){ return a?a.slice(0,6)+"…"+a.slice(-4):"-"; }
+function logPay(m){ payLog.textContent+="\n"+m; }
+
+/* MetaMask ERC-20 transfer on Base */
+async function payWithMetaMask(q){
+  if(!window.ethereum) throw new Error("MetaMask not found");
+  const [account]=await ethereum.request({method:"eth_requestAccounts"});
+
+  const baseHex="0x2105";
+  const chainId=await ethereum.request({method:"eth_chainId"});
+  if(chainId!==baseHex){
+    try{ await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:baseHex}]}); }
+    catch{ throw new Error("Please switch to Base (0x2105) in MetaMask."); }
+  }
+
+  const amountFloat=parseFloat((q.price||"0").split(" ")[0]||"0");
+  const amount=BigInt(Math.round(amountFloat*(10**q.decimals)));
+
+  const data=encodeTransfer(q.to,amount.toString());
+  logPay("Sending transfer: "+amountFloat+" "+q.tokenSymbol);
+  const txHash=await ethereum.request({method:"eth_sendTransaction",params:[{from:account,to:q.tokenAddress,data}]});
+  logPay("Tx submitted: "+txHash+" — waiting for 1 confirmation…");
+  await waitReceipt(txHash); dlg.close(); return txHash;
+}
+function encodeTransfer(to,amountDec){ const sig="0xa9059cbb"; const to32=to.replace(/^0x/,"").padStart(64,"0"); const amtHex=BigInt(amountDec).toString(16).padStart(64,"0"); return sig+to32+amtHex; }
+async function waitReceipt(hash){ for(;;){ const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[hash]}); if(r&&r.status==="0x1") return; await new Promise(r=>setTimeout(r,1800)); } }
+</script>
+</body>
+</html>
