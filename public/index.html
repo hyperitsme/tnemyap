@@ -4,88 +4,77 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Pay-Per-Request Gateway</title>
-  <link rel="icon" href="/assets/logo.png" />
+  <link rel="icon" href="https://angy-frog.site/assets/logo.png" />
   <style>
     :root{
-      --accent:#5d3e84;
-      --accent-2:#412a61;
-      --bg:#ffffff;
-      --text:#111213;
-      --sub:#6b7280;
-      --ring:rgba(93,62,132,.25);
-      --muted:#f3f4f6;
-      --border:#ececf0;
-      --ok:#12b886;
-      --bad:#ef4444;
+      --accent:#5d3e84; --accent-2:#412a61;
+      --bg:#ffffff; --text:#131316; --sub:#6b7280;
+      --border:#ececf1; --muted:#f6f7fb;
+      --ring:rgba(93,62,132,.28); --ok:#12b886; --bad:#ef4444;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
     body{
       margin:0;background:var(--bg);color:var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
-    a{color:var(--accent);text-decoration:none}
-    .container{max-width:1120px;margin:0 auto;padding:0 20px}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1100px;margin:0 auto;padding:0 20px}
 
     /* Header */
-    .header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:30}
+    .header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:20}
     .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
     .brand{display:flex;align-items:center;gap:12px}
     .brand img{height:28px}
-    .brand h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.2px}
-    .actions{display:flex;align-items:center;gap:10px}
-    .pill{border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
-    .pill:hover{border-color:#ddd}
-    .btn{
-      background:linear-gradient(180deg,var(--accent),var(--accent-2));
-      color:#fff;border:none;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;
-      box-shadow:0 8px 20px var(--ring);
-    }
-    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .brand h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px}
+    .xlink{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff}
+    .xlink svg{width:16px;height:16px}
 
     /* Hero */
-    .hero{padding:42px 0 22px}
-    .h-title{font-size:30px;line-height:1.15;margin:0 0 8px}
-    .h-sub{color:var(--sub);max-width:760px;margin:0}
+    .hero{padding:56px 0 22px}
+    .title{font-size:36px;line-height:1.12;margin:0 0 10px;letter-spacing:-.02em}
+    .sub{color:var(--sub);max-width:760px;margin:0}
 
-    /* Panels */
-    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin:28px 0}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
-    .card{
-      border:1px solid var(--border);border-radius:16px;background:#fff;
-      box-shadow:0 12px 36px rgba(17,17,17,.05);
+    /* Primary panel */
+    .panel{
+      margin:28px 0;border:1px solid var(--border);border-radius:18px;background:#fff;
+      box-shadow:0 14px 40px rgba(0,0,0,.06);
     }
-    .card .hd{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .card .bd{padding:18px}
-
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .row > *{flex:1}
-    input,select{
-      width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;
-      outline:none
+    .panel .hd{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .panel .bd{padding:18px}
+    .badge{display:inline-flex;align-items:center;gap:8px;background:#f3ecfb;color:#3a2857;border:1px solid #ece3fb;padding:6px 10px;border-radius:999px;font-size:12px}
+    .dot{width:8px;height:8px;border-radius:50%;background:#a2a8b3}
+    .btn{
+      background:linear-gradient(180deg,var(--accent),var(--accent-2));
+      color:#fff;border:none;border-radius:14px;padding:14px 18px;font-weight:800;cursor:pointer;
+      box-shadow:0 10px 26px var(--ring);
     }
-    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .actions{display:flex;gap:12px;flex-wrap:wrap}
     .muted{color:var(--sub)}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;
-      background:#f5f3f9;color:#3c2c58;border:1px solid #ece7f6}
-    .status-dot{width:8px;height:8px;border-radius:50%;background:#9aa0aa}
-    .status-ok{background:var(--ok)} .status-bad{background:var(--bad)}
+    .console{
+      background:#0b0c10;color:#e9f5ff;border-radius:12px;padding:12px;min-height:120px;
+      white-space:pre-wrap;word-break:break-word;margin-top:14px
+    }
 
-    .console{background:#0b0c10;color:#e8f5ff;border-radius:12px;padding:12px;min-height:120px;white-space:pre-wrap;word-break:break-word}
-    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;padding:3px 6px;border-radius:6px;background:#eef2ff;border:1px solid #dbe3ff}
+    /* Grid */
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
 
     /* Modal */
-    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;place-items:center;z-index:50}
-    .modal{width:min(720px,96vw);background:#fff;border-radius:16px;box-shadow:0 30px 90px rgba(0,0,0,.35);overflow:hidden}
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;place-items:center;z-index:50}
+    .modal{width:min(720px,96vw);background:#fff;border-radius:18px;box-shadow:0 30px 90px rgba(0,0,0,.4);overflow:hidden}
     .modal .hd{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
     .modal .title{margin:0;font-size:18px}
+    .pill{border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 12px;cursor:pointer}
     .kv{display:grid;grid-template-columns:160px 1fr;gap:8px;margin:8px 0}
-    .log{background:#0c0d12;color:#d0ffd8;border-radius:12px;padding:12px;min-height:90px;white-space:pre-wrap}
-    .tagsm{display:inline-block;background:#f1ecf8;color:#3b2b52;border-radius:999px;padding:2px 10px;font-weight:700}
+    .tag{display:inline-block;padding:2px 10px;border-radius:999px;background:#f0ecf8;color:#3a2857;font-weight:700}
+    .log{background:#0c0d12;color:#d3ffd9;border-radius:12px;padding:12px;min-height:90px;white-space:pre-wrap}
+    .warn{color:var(--bad);font-weight:600}
 
     /* Footer */
-    .ft{padding:22px 0;border-top:1px solid var(--border);text-align:center;color:#9095a1}
+    .footer{padding:28px 0;border-top:1px solid var(--border);text-align:center;color:#9197a3}
+    .brand-accent{color:var(--accent);font-weight:800}
   </style>
 </head>
 <body>
@@ -94,75 +83,61 @@
     <div class="container">
       <div class="nav">
         <div class="brand">
-          <img src="/assets/logo.png" alt="Logo" />
+          <img src="https://angy-frog.site/assets/logo.png" alt="Logo" />
           <h1>Pay-Per-Request Gateway</h1>
         </div>
-        <div class="actions">
-          <button class="pill" id="openSettings">Settings</button>
-          <a class="pill" href="/health" target="_blank" rel="noopener">Health</a>
-        </div>
+        <a class="xlink" href="https://x.com/tnemyaplabsxyz" target="_blank" rel="noopener">
+          <!-- X icon -->
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.146 2H21l-6.98 8.052L22.5 22h-6.873l-5.37-6.77L3.9 22H1l7.49-8.64L1 2h6.99l5.01 6.313L18.146 2Zm-2.402 18h1.894L7.34 4H5.403l10.34 16Z"/>
+          </svg>
+          <span>@tnemyaplabsxyz</span>
+        </a>
       </div>
     </div>
   </div>
 
   <!-- Hero -->
   <div class="container hero">
-    <h2 class="h-title">Charge per request. Deliver value after payment.</h2>
-    <p class="h-sub">This gateway responds with <span class="kbd">HTTP 402</span> and payment metadata. After a valid USDC transfer on Base, the request is redeemed and the premium payload is returned.</p>
+    <h2 class="title">Charge per request. Deliver value after payment.</h2>
+    <p class="sub">The gateway replies with <b>HTTP 402</b> and payment metadata. After a valid USDC transfer on Base, the request is redeemed and the premium payload is returned.</p>
   </div>
 
-  <!-- Main -->
+  <!-- Main panels -->
   <div class="container grid">
     <!-- Left: Action -->
-    <section class="card">
+    <section class="panel">
       <div class="hd">
-        <strong>Protected Endpoint</strong>
-        <span class="badge"><span class="status-dot" id="liveDot"></span> <span id="liveText">Idle</span></span>
+        <strong>Protected Access</strong>
+        <span class="badge"><span id="dot" class="dot"></span> <span id="state">Idle</span></span>
       </div>
       <div class="bd">
-        <div class="row">
-          <div>
-            <label class="muted">API Base URL</label>
-            <input id="apiBase" />
-          </div>
-          <div style="max-width:260px">
-            <label class="muted">Endpoint</label>
-            <select id="endpoint">
-              <option value="/v1/alpha-signal">/v1/alpha-signal</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:14px">
+        <div class="actions">
           <button class="btn" id="btnRequest">Request Data</button>
-          <button class="pill" id="btnClear">Clear Console</button>
+          <button class="pill" id="btnHealth" title="Check service health">Health</button>
+          <button class="pill" id="btnClear" title="Clear output">Clear</button>
         </div>
-
-        <div class="console" id="console" style="margin-top:14px">Ready.</div>
+        <div id="out" class="console">Ready.</div>
       </div>
     </section>
 
-    <!-- Right: Summary -->
-    <section class="card">
-      <div class="hd">
-        <strong>How it Works</strong>
-      </div>
+    <!-- Right: How it works -->
+    <section class="panel">
+      <div class="hd"><strong>How it Works</strong></div>
       <div class="bd">
         <ol style="margin:0 0 12px 18px;line-height:1.65">
-          <li>You call a protected endpoint.</li>
-          <li>Server answers with <b>HTTP 402</b> + price, token, chain, nonce, expiry.</li>
-          <li>A payment modal asks for USDC on Base to your merchant address.</li>
-          <li>Client sends <span class="kbd">txHash</span> + <span class="kbd">nonce</span> to <span class="kbd">/redeem</span>.</li>
-          <li>Server verifies transfer → returns the premium payload.</li>
+          <li>Call the protected endpoint.</li>
+          <li>Server answers with <b>HTTP 402</b> (price, token, chain, nonce, expiry).</li>
+          <li>A payment modal asks for USDC on Base to the merchant address.</li>
+          <li>Client submits <code>txHash</code> and <code>nonce</code> to <code>/redeem</code>.</li>
+          <li>Server verifies the transfer → returns the premium payload.</li>
         </ol>
-        <div class="muted" style="margin-top:10px">
-          Network: <b>Base</b> • Token: <b>USDC</b> • You need a small amount of <b>ETH</b> for gas.
-        </div>
+        <div class="muted">Network: <b>Base</b> • Token: <b>USDC</b> • Small amount of <b>ETH</b> is required for gas.</div>
       </div>
     </section>
   </div>
 
-  <!-- Modal -->
+  <!-- Payment Modal -->
   <div class="backdrop" id="backdrop">
     <div class="modal">
       <div class="hd">
@@ -170,136 +145,136 @@
         <button class="pill" id="closeModal">Close</button>
       </div>
       <div class="bd" style="padding:18px 20px">
-        <div class="kv"><div>Price</div><div><span id="mPrice" class="tagsm">-</span></div></div>
+        <div class="kv"><div>Price</div><div><span id="mPrice" class="tag">-</span></div></div>
         <div class="kv"><div>Token</div><div>USDC</div></div>
         <div class="kv"><div>Chain</div><div>Base</div></div>
         <div class="kv"><div>To</div><div id="mTo" class="muted">-</div></div>
         <div class="kv"><div>Nonce</div><div id="mNonce" class="muted">-</div></div>
         <div class="kv"><div>Expiry</div><div id="mExp" class="muted">-</div></div>
 
-        <div class="row" style="margin-top:14px">
+        <div class="actions" style="margin-top:14px">
           <button class="btn" id="btnPay">Pay with MetaMask</button>
           <button class="pill" id="btnCancel">Cancel</button>
+          <span id="tip" class="muted" style="align-self:center">Use Base network and have USDC + a little ETH for gas.</span>
         </div>
 
-        <div class="log" id="mLog" style="margin-top:14px">Ready.</div>
+        <div id="mlog" class="log" style="margin-top:14px">Ready.</div>
       </div>
     </div>
   </div>
 
-  <div class="ft">© tnemyap</div>
+  <div class="footer">© <span class="brand-accent">tnemyap</span></div>
 
   <!-- App -->
   <script type="module">
     import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.min.js";
 
-    const $ = (id)=>document.getElementById(id);
-    const c = $("console");
-    const log = (s)=>{ c.textContent=(c.textContent?c.textContent+"\\n":"")+s; c.scrollTop=c.scrollHeight; };
-    const mlog = (s)=>{ const el=$("mLog"); el.textContent=(el.textContent?el.textContent+"\\n":"")+s; el.scrollTop=el.scrollHeight; };
+    const $ = id => document.getElementById(id);
+    const out = $("out"); const dot = $("dot"); const state = $("state");
+    const log  = s => { out.textContent = (out.textContent?out.textContent+"\\n":"")+s; out.scrollTop = out.scrollHeight; };
+    const mlog = s => { const el=$("mlog"); el.textContent = (el.textContent?el.textContent+"\\n":"")+s; el.scrollTop=el.scrollHeight; };
 
-    // Default API base = current origin
-    $("apiBase").value = window.location.origin;
+    const setBusy = b => { dot.style.background = b? "#a2a8b3" : "#12b886"; state.textContent = b? "Working…" : "Idle"; };
+    const setErr  = () => { dot.style.background = "#ef4444"; state.textContent = "Error"; };
 
-    // Status badge helpers
-    const liveDot = $("liveDot");
-    const liveText = $("liveText");
-    const setBusy = (b)=>{ liveDot.classList.toggle("status-ok", !b); liveDot.classList.toggle("status-bad", false); liveText.textContent=b?"Working…":"Idle"; };
-    const setError = ()=>{ liveDot.classList.add("status-bad"); liveText.textContent="Error"; };
+    // Fixed endpoint on same origin (no inputs exposed)
+    const BASE   = window.location.origin;
+    const EP     = "/v1/alpha-signal";
+    const REDEEM = "/v1/alpha-signal/redeem";
 
     // Modal helpers
-    const showModal = ()=>($("backdrop").style.display="grid");
-    const hideModal = ()=>($("backdrop").style.display="none");
+    const show = () => ($("backdrop").style.display="grid");
+    const hide = () => ($("backdrop").style.display="none");
+    $("btnCancel").onclick = hide; $("closeModal").onclick = hide;
 
-    // Constants
-    const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-    const ERC20_ABI = ["function transfer(address to,uint256 amount) returns (bool)","function balanceOf(address) view returns (uint256)"];
-
-    let lastHeaders = null;
+    let headers = null;
     let paying = false;
 
-    // Settings quick toggle (for base URL only)
-    $("openSettings").onclick = ()=>{
-      const f = prompt("API Base URL", $("apiBase").value);
-      if (f) $("apiBase").value = f.trim();
+    // Health
+    $("btnHealth").onclick = async ()=>{
+      setBusy(true);
+      try{
+        const r = await fetch(new URL("/health", BASE));
+        const t = await r.text();
+        log(`Health ${r.status}: ${t}`);
+      }catch(e){ setErr(); log("Error: "+(e.message||e)); }
+      finally{ setBusy(false); }
     };
 
-    $("btnClear").onclick = ()=>{ c.textContent=""; };
+    // Clear
+    $("btnClear").onclick = ()=>{ out.textContent=""; };
 
-    // Request protected endpoint → may return 402 with headers
+    // Request protected data
     $("btnRequest").onclick = async ()=>{
       setBusy(true);
       try{
-        const base = $("apiBase").value;
-        const ep = $("endpoint").value;
-        const res = await fetch(new URL(ep, base), { method:"GET" });
-        const txt = await res.text();
-        log(`Request ${res.status}: ${txt}`);
-
-        if(res.status===402){
-          lastHeaders = res.headers;
-          $("mPrice").textContent = res.headers.get("X-402-Amount") || "-";
-          $("mTo").textContent    = res.headers.get("X-402-To")     || "-";
-          $("mNonce").textContent = res.headers.get("X-402-Nonce")  || "-";
-          const exp = res.headers.get("X-402-Expires-At");
+        const r = await fetch(new URL(EP, BASE), { method:"GET" });
+        const txt = await r.text();
+        log(`Request ${r.status}: ${txt}`);
+        if (r.status === 402){
+          headers = r.headers;
+          $("mPrice").textContent = r.headers.get("X-402-Amount") || "-";
+          $("mTo").textContent    = r.headers.get("X-402-To")     || "-";
+          $("mNonce").textContent = r.headers.get("X-402-Nonce")  || "-";
+          const exp = r.headers.get("X-402-Expires-At");
           $("mExp").textContent   = exp ? new Date(Number(exp)).toLocaleString() : "-";
-          $("mLog").textContent   = "Ready.";
-          showModal();
+          $("mlog").textContent   = "Ready.";
+          show();
         }
-      }catch(e){
-        setError();
-        log("Error: "+(e.message||e));
-      }finally{
-        setBusy(false);
-      }
+      }catch(e){ setErr(); log("Error: "+(e.message||e)); }
+      finally{ setBusy(false); }
     };
 
-    $("btnCancel").onclick = hideModal;
-    $("closeModal").onclick = hideModal;
+    // Pay + Redeem
+    const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+    const ABI  = [
+      "function transfer(address to,uint256 amount) returns (bool)",
+      "function balanceOf(address) view returns (uint256)"
+    ];
 
     $("btnPay").onclick = async ()=>{
-      if(paying) return;
+      if (paying) return;
       paying = true; $("btnPay").disabled = true;
 
       try{
-        if(!window.ethereum) throw new Error("MetaMask not detected.");
+        if (!window.ethereum) throw new Error("MetaMask not detected.");
         mlog("Connecting wallet…");
         const accts = await ethereum.request({ method:"eth_requestAccounts" });
-        const addr = accts[0];
-        mlog("Wallet: "+addr);
+        const addr = accts[0]; mlog("Wallet: "+addr);
 
         // Ensure Base
         const baseId = "0x2105";
-        const curId = await ethereum.request({ method:"eth_chainId" });
-        if(curId !== baseId){
+        const curId  = await ethereum.request({ method:"eth_chainId" });
+        if (curId !== baseId){
           try{
             await ethereum.request({ method:"wallet_switchEthereumChain", params:[{ chainId: baseId }] });
           }catch(err){
-            if(err.code===4902){
+            if (err.code === 4902){
               await ethereum.request({
                 method:"wallet_addEthereumChain",
-                params:[{ chainId: baseId, chainName:"Base", nativeCurrency:{ name:"ETH", symbol:"ETH", decimals:18 },
-                          rpcUrls:["https://mainnet.base.org"], blockExplorerUrls:["https://basescan.org"] }]
+                params:[{ chainId: baseId, chainName:"Base",
+                  nativeCurrency:{ name:"ETH", symbol:"ETH", decimals:18 },
+                  rpcUrls:["https://mainnet.base.org"], blockExplorerUrls:["https://basescan.org"] }]
               });
-            }else{ throw err; }
+            } else { throw err; }
           }
         }
 
-        const to    = lastHeaders.get("X-402-To");
-        const amtH  = lastHeaders.get("X-402-Amount");
-        const nonce = lastHeaders.get("X-402-Nonce");
+        const to    = headers.get("X-402-To");
+        const amtH  = headers.get("X-402-Amount");
+        const nonce = headers.get("X-402-Nonce");
         if(!to || !amtH || !nonce) throw new Error("Missing 402 headers.");
 
         const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const usdc = new ethers.Contract(USDC, ERC20_ABI, signer);
+        const signer   = await provider.getSigner();
+        const usdc     = new ethers.Contract(USDC, ABI, signer);
+        const need6    = ethers.parseUnits(amtH, 6);
 
-        // Pre-check balance for friendlier UX
+        // UX: check balance first
         const bal6 = await usdc.balanceOf(addr);
-        const need6 = ethers.parseUnits(amtH, 6);
         if (bal6 < need6){
           mlog(`❌ Insufficient USDC. Need ${amtH}, you have ${ethers.formatUnits(bal6,6)}.`);
-          paying=false; $("btnPay").disabled = false; return;
+          paying=false; $("btnPay").disabled=false; return;
         }
 
         mlog(`Sending USDC ${amtH} to ${to}…`);
@@ -309,22 +284,25 @@
         mlog("Confirmed in block "+rc.blockNumber);
 
         // Redeem
-        const redeem = `/v1/alpha-signal/redeem?nonce=${encodeURIComponent(nonce)}&tx=${tx.hash}`;
-        const rr = await fetch(new URL(redeem, $("apiBase").value));
+        const url = new URL(REDEEM, BASE);
+        url.searchParams.set("nonce", nonce);
+        url.searchParams.set("tx", tx.hash);
+        const rr = await fetch(url);
         const data = await rr.json();
         mlog("Redeem response: "+JSON.stringify(data,null,2));
-        if(rr.ok){
-          hideModal();
+        if (rr.ok){
+          hide();
           log("✅ Payload: "+JSON.stringify(data));
-        }else{
+        } else {
           log("❌ Redeem failed: "+(data.error||rr.status));
         }
+
       }catch(e){
-        if(e.code===-32002) mlog("❌ MetaMask request already pending. Close the existing pop-up and try again.");
-        else if(String(e).includes("exceeds balance")) mlog("❌ Transfer failed: USDC balance is not sufficient.");
+        if (e.code === -32002) mlog("❌ MetaMask request already pending. Close the existing pop-up and retry.");
+        else if (String(e).includes("exceeds balance")) mlog("❌ Transfer failed: USDC balance is not sufficient.");
         else mlog("❌ "+(e.shortMessage||e.message||e));
       }finally{
-        paying=false; $("btnPay").disabled = false;
+        paying=false; $("btnPay").disabled=false;
       }
     };
   </script>
