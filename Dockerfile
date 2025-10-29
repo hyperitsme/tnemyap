@@ -1,16 +1,12 @@
-# Dockerfile
 FROM node:20-alpine
 
 WORKDIR /app
 
-# copy manifest dulu (biar cache bagus)
+# Copy manifests for caching
 COPY package.json ./
-# copy lockfile kalau ada (wildcard supaya tidak error saat tidak ada)
 COPY package-lock.json* ./
 
-# install deps:
-# - kalau ada lockfile: npm ci
-# - kalau tidak ada: npm install
+# Install dependencies
 RUN set -eux; \
   if [ -f package-lock.json ]; then \
     npm ci --omit=dev; \
@@ -18,7 +14,7 @@ RUN set -eux; \
     npm install --omit=dev; \
   fi
 
-# baru copy source lainnya
+# Copy the rest
 COPY . .
 
 EXPOSE 8080
