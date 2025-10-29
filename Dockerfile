@@ -1,7 +1,7 @@
 # Dockerfile
 FROM node:20-bookworm-slim
 
-# Paket build utk modul native (pg) + libpq
+# Tools untuk modul native (pg) + SSL
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     python3 build-essential pkg-config libpq-dev ca-certificates \
@@ -9,23 +9,17 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Copy manifest dulu agar layer cache efektif
+# Salin manifest dulu untuk caching
 COPY package.json package-lock.json* ./
 
-# Pakai npm ci kalau ada lockfile; fallback ke npm install kalau tidak ada
+# 1-liner fallback: coba `npm ci`, kalau gagal (mis. lockfile tidak ada) → `npm install`
 RUN --mount=type=cache,target=/root/.npm \
-    if [ -f package-lock.json ]; then \
-      echo ">>> Using npm ci"; \
-      npm ci --omit=dev; \
-    else \
-      echo ">>> Using npm install"; \
-      npm install --omit=dev; \
-    fi
+    npm ci --omit=dev || npm install --omit=dev
 
-# Copy source
+# Salin sisa source
 COPY . .
 
-# Pastikan service listen di PORT yg diberikan Render
+# Jalankan di port Render
 ENV PORT=8080
 EXPOSE 8080
 
