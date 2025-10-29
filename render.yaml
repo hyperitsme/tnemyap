@@ -25,7 +25,7 @@ services:
       - key: EVM_TOKEN_SYMBOL
         value: USDC
       - key: MERCHANT_EVM
-        value: 0xYourReceiverAddr
+        value: 0xYourReceiverAddressHere
       - key: SERVER_SECRET
         generateValue: true
       - key: QUOTE_TTL_SEC
