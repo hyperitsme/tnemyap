@@ -1,236 +1,243 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>tnemyap — HTTP 402 Pay-Per-Request</title>
-<style>
-  :root{
-    --bg:#ffffff; --panel:#fafafa; --line:#e5e7eb; --text:#1b1b1b; --mut:#6b7280;
-    --accent:#5d3e84; --accent-2:#7a59a8; --shadow:0 8px 28px rgba(17,24,39,.08);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.6 Inter,ui-sans-serif,system-ui,Segoe UI,Arial}
-  a{color:var(--accent);text-decoration:none}
-  .wrap{max-width:1120px;margin:0 auto;padding:24px}
-  .nav{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
-  .brand{display:flex;gap:10px;align-items:center;font-weight:800;letter-spacing:.2px}
-  .brand img{height:28px;width:auto;display:block}
-  .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:999px}
-  .grid{display:grid;gap:16px}
-  .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-  @media (max-width:900px){.g-2,.g-3{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
-  h1{font-size:28px;margin:10px 0 6px}
-  h2{font-size:18px;margin:0 0 8px}
-  .mut{color:var(--mut)}
-  .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-  button{
-    background:var(--accent);border:0;border-radius:12px;color:#fff;font-weight:800;
-    padding:12px 16px;cursor:pointer;transition:.18s transform, .18s box-shadow; box-shadow:0 6px 16px rgba(93,62,132,.25)
-  }
-  button:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(93,62,132,.28)}
-  button.ghost{background:#fff;border:1px solid var(--line);color:var(--accent);box-shadow:none}
-  input,select{width:100%;background:#fff;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px}
-  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .kpi{display:flex;gap:10px;align-items:center}
-  .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(93,62,132,.12)}
-  .footer{margin:40px 0 20px;color:var(--mut);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  .hl{color:var(--accent)}
-  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:20px 0}
-  pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);padding:12px;border-radius:12px;max-height:320px;overflow:auto}
-  .flow{position:relative;border:1px dashed var(--line);border-radius:12px;padding:12px;background:#fff}
-  dialog{border:none;border-radius:16px;padding:0;background:#fff;color:var(--text);max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.18)}
-  .modal{padding:18px}
-  .grid-quote{display:grid;grid-template-columns:120px 1fr;gap:8px 12px}
-  .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#efe9f7;border:1px solid #e2d7f3;font-size:12px;color:#3b2b55}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HTTP 402 Pay-Per-Request</title>
+  <link rel="icon" href="/assets/logo.png" />
+  <style>
+    :root { --accent:#5d3e84; --bg:#fff; --text:#141414; --muted:#666; }
+    * { box-sizing: border-box; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin:0; background:var(--bg); color:var(--text); }
+    header { display:flex; align-items:center; gap:12px; padding:20px; border-bottom:1px solid #eee; }
+    header img { height:28px; }
+    h1 { margin:0; font-size:22px; letter-spacing:.2px; }
+    main { max-width:980px; margin:32px auto; padding:0 16px; }
+    .card { border:1px solid #eee; border-radius:14px; padding:20px; box-shadow:0 6px 24px rgba(0,0,0,.04); background:#fff; }
+    .row { display:flex; gap:16px; flex-wrap:wrap; }
+    .btn { background:var(--accent); color:#fff; border:none; border-radius:10px; padding:12px 16px; font-weight:600; cursor:pointer; }
+    .btn:disabled { opacity:.6; cursor:not-allowed; }
+    .pill { border:1px solid #ddd; padding:10px 12px; border-radius:10px; background:#fff; cursor:pointer; }
+    input, select { padding:10px 12px; border:1px solid #e5e5e5; border-radius:10px; width:100%; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .muted { color:var(--muted); }
+    /* Modal */
+    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.3); display:none; place-items:center; }
+    .modal { width:min(660px,92vw); background:#fff; border-radius:14px; box-shadow:0 24px 70px rgba(0,0,0,.25); }
+    .modal header { border-bottom:1px solid #eee; }
+    .modal .body { padding:20px; }
+    .kv { display:grid; grid-template-columns:140px 1fr; gap:10px; margin:6px 0; }
+    .tag { display:inline-block; padding:2px 8px; background:#f4f1f8; color:#3b2b52; border-radius:999px; font-weight:600; }
+    .logs { background:#0b0b0b; color:#d1ffd1; border-radius:10px; padding:10px; min-height:80px; white-space:pre-wrap; }
+    footer { text-align:center; padding:24px; color:#888; }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-        <img src="/assets/logo.png" alt="tnemyap logo"/>
-        <span>tnemyap</span>
-      </div>
+  <header>
+    <img src="/assets/logo.png" alt="logo" />
+    <h1>HTTP <span style="color:var(--accent)">402</span> Pay-Per-Request Engine</h1>
+  </header>
+
+  <main class="row">
+    <section class="card" style="flex:1 1 360px;">
+      <h3>Quick Test</h3>
       <div class="row">
-        <a class="pill" href="#" id="xOnly" title="X (Twitter)">X</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <h1>HTTP <span class="hl">402</span> Pay-Per-Request Engine</h1>
-      <p class="mut">Your API answers with <span class="hl">402 Payment Required</span> and a quote; the client pays (USDC on Base), retries with proof, and receives the data.</p>
-      <div class="grid g-3" style="margin-top:12px">
-        <div class="flow"><h2>1) Request</h2><p class="mut">Client calls a protected endpoint.</p></div>
-        <div class="flow"><h2>2) 402 Quote</h2><p class="mut">Server returns X-402 headers (price, token, nonce, TTL).</p></div>
-        <div class="flow"><h2>3) Pay → Retry</h2><p class="mut">Wallet pays USDC → client retries with <code class="mono">X-402-Proof</code>.</p></div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="grid g-2">
-      <div class="card">
-        <h2>Quick Test</h2>
-        <div class="row" style="margin-bottom:10px">
-          <div style="flex:1;min-width:240px">
-            <label class="mut">API Base URL</label>
-            <input id="apiBase" value="http://localhost:8080"/>
-          </div>
-          <div>
-            <label class="mut">Endpoint</label>
-            <select id="endpoint">
-              <option value="/v1/alpha-signal">/v1/alpha-signal</option>
-            </select>
-          </div>
+        <div style="flex:1 1 380px;">
+          <label class="muted">API Base URL</label>
+          <input id="apiBase" />
         </div>
-        <div class="row" style="margin-bottom:10px">
-          <button id="btnCall">Call Protected</button>
-          <button class="ghost" id="btnHealth">Health</button>
-          <span class="kpi mut"><span class="dot" id="dot"></span><span id="status">Idle</span></span>
+        <div style="width:220px;">
+          <label class="muted">Endpoint</label>
+          <select id="endpoint">
+            <option value="/v1/alpha-signal">/v1/alpha-signal</option>
+          </select>
         </div>
-        <pre id="out" class="mono">Output will appear here…</pre>
       </div>
+      <div style="margin-top:12px;" class="row">
+        <button class="btn" id="btnProtected">Call Protected</button>
+        <button class="pill" id="btnHealth">Health</button>
+        <span id="stateDot" class="muted">• Idle</span>
+      </div>
+      <div style="margin-top:12px;" class="logs" id="console">Ready.</div>
+    </section>
 
-      <div class="card">
-        <h2>Receipts (last 100)</h2>
-        <div class="row" style="margin-bottom:10px">
-          <button id="btnReceipts" class="ghost">Refresh</button>
-          <span class="mut">Reads <code>/admin/receipts</code> from your API.</span>
+    <section class="card" style="flex:1 1 360px;">
+      <h3>How it works</h3>
+      <ol>
+        <li>Call protected endpoint → server balas <strong>HTTP 402</strong> + header harga</li>
+        <li>UI membuka modal pembayaran</li>
+        <li>User bayar <b>USDC</b> di <b>Base</b> ke merchant</li>
+        <li>UI kirim <code>txHash</code> + <code>nonce</code> ke <code>/redeem</code></li>
+        <li>Server verifikasi tx → kirim data berbayar</li>
+      </ol>
+      <p class="muted">Pastikan MetaMask ada jaringan <b>Base</b> & punya USDC.</p>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <header>
+        <h3 style="margin:0 20px;">Payment Required</h3>
+      </header>
+      <div class="body">
+        <div class="kv"><div>Price</div><div><span id="mPrice" class="tag">-</span></div></div>
+        <div class="kv"><div>Token</div><div>USDC</div></div>
+        <div class="kv"><div>Chain</div><div>Base</div></div>
+        <div class="kv"><div>To</div><div id="mTo" class="muted">-</div></div>
+        <div class="kv"><div>Nonce</div><div id="mNonce" class="muted">-</div></div>
+        <div class="kv"><div>Expiry</div><div id="mExp" class="muted">-</div></div>
+
+        <div class="row" style="margin-top:14px;">
+          <button class="btn" id="btnPay">Pay with MetaMask</button>
+          <button class="pill" id="btnCancel">Cancel</button>
         </div>
-        <pre id="receipts" class="mono">No data yet.</pre>
+
+        <div style="margin-top:12px;" class="logs" id="mLog">Ready.</div>
       </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="card">
-      <h2>Developer Notes</h2>
-      <ul>
-        <li>Chain: <b>Base</b> (chainId <code>0x2105</code>) — Token: <b>USDC</b>.</li>
-        <li>Payment modal opens on <code>402</code>, then client retries with <code>X-402-Proof</code>.</li>
-      </ul>
-    </div>
-
-    <div class="footer">
-      <span>© <span id="year"></span> tnemyap — pay-per-request</span>
-      <span class="mut">Social: X only</span>
     </div>
   </div>
 
-  <!-- 402 Payment Modal -->
-  <dialog id="payDlg">
-    <div class="modal">
-      <h2 style="margin:6px 0 4px">Payment Required</h2>
-      <p class="mut">Approve the payment below to continue.</p>
-      <div class="grid-quote">
-        <div>Price</div><div><span id="qPrice" class="badge"></span></div>
-        <div>Token</div><div><span id="qToken" class="mono"></span></div>
-        <div>Chain</div><div><span id="qChain" class="mono"></span></div>
-        <div>To</div><div><span id="qTo" class="mono"></span></div>
-        <div>Nonce</div><div><span id="qNonce" class="mono"></span></div>
-        <div>Expiry</div><div><span id="qExp" class="mono"></span></div>
-      </div>
-      <div class="row" style="margin-top:14px">
-        <button id="btnPayMeta">Pay with MetaMask</button>
-        <button class="ghost" id="btnCancel">Cancel</button>
-      </div>
-      <pre id="payLog" class="mono" style="margin-top:10px;max-height:160px">Ready.</pre>
-    </div>
-  </dialog>
+  <footer>© tnemyap</footer>
 
-<script>
-const $=(id)=>document.getElementById(id);
-const apiBase=$("apiBase"), endpoint=$("endpoint"), out=$("out"), receipts=$("receipts");
-const statusEl=$("status"), dot=$("dot"), year=$("year"); year.textContent=new Date().getFullYear();
+  <script type="module">
+    import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.min.js";
 
-const dlg=$("payDlg");
-const qPrice=$("qPrice"), qToken=$("qToken"), qChain=$("qChain"), qTo=$("qTo"), qNonce=$("qNonce"), qExp=$("qExp"), payLog=$("payLog");
+    // ==== Helpers ====
+    const log = (s) => { const c=document.getElementById('console'); c.textContent = (c.textContent?c.textContent+"\n":"")+s; c.scrollTop=c.scrollHeight; };
+    const mlog = (s) => { const c=document.getElementById('mLog'); c.textContent = (c.textContent?c.textContent+"\n":"")+s; c.scrollTop=c.scrollHeight; };
+    const $ = (id) => document.getElementById(id);
 
-$("btnHealth").onclick=async()=>{
-  setBusy(true,"Pinging /health…");
-  try{ const r=await fetch(join(apiBase.value,"/health")); out.textContent=await r.text(); }
-  catch(e){ out.textContent=String(e); }
-  setBusy(false);
-};
-$("btnReceipts").onclick=async()=>{
-  setBusy(true,"Loading receipts…");
-  try{ const r=await fetch(join(apiBase.value,"/admin/receipts")); receipts.textContent=JSON.stringify(await r.json(),null,2)||"[]"; }
-  catch(e){ receipts.textContent=String(e); }
-  setBusy(false);
-};
-$("btnCall").onclick=async()=>{
-  out.textContent=""; setBusy(true,"Calling protected endpoint…");
-  try{ const data=await x402Fetch(join(apiBase.value,endpoint.value)); out.textContent=pretty(data); }
-  catch(e){ out.textContent="Error: "+(e?.message||e); }
-  setBusy(false);
-};
+    // Default Base URL = origin
+    const apiBase = $("apiBase");
+    apiBase.value = window.location.origin;
 
-function setBusy(b,msg){ statusEl.textContent=msg||(b?"Working…":"Idle"); dot.style.opacity=b?1:.35; }
-function pretty(x){ return typeof x==="string"?x:JSON.stringify(x,null,2); }
-function join(base,path){ return base.replace(/\/+$/,"")+(path.startsWith("/")?"":"/")+path; }
+    // Modal
+    const modal = $("modal");
+    const showModal = () => (modal.style.display="grid");
+    const hideModal = () => (modal.style.display="none");
 
-/* Fetch with 402 handling */
-async function x402Fetch(url,opts={}){
-  let res=await fetch(url,opts);
-  if(res.status!==402) return res.json();
+    const USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+    const ERC20_ABI = ["function transfer(address to,uint256 amount) returns (bool)"];
 
-  const q={
-    price:res.headers.get("X-402-Price"),
-    chain:res.headers.get("X-402-Chain"),
-    tokenSymbol:res.headers.get("X-402-Token"),
-    tokenAddress:res.headers.get("X-402-TokenAddress"),
-    decimals:parseInt(res.headers.get("X-402-Decimals")||"6",10),
-    to:res.headers.get("X-402-Address"),
-    nonce:res.headers.get("X-402-Nonce"),
-    expiry:res.headers.get("X-402-Expiry"),
-  };
-  showQuote(q);
+    let lastHeaders = null;
 
-  const txHash=await payWithMetaMask(q).catch(e=>{ logPay("❌ "+(e?.message||e)); throw e; });
-  logPay("✅ Paid: "+txHash);
+    async function call(path) {
+      const res = await fetch(new URL(path, apiBase.value), { method:"GET" });
+      return res;
+    }
 
-  const res2=await fetch(url,{...opts,headers:{...(opts.headers||{}),"X-402-Proof":`tx=${txHash}; nonce=${q.nonce}`}});
-  if(!res2.ok) throw new Error("Retry failed: "+res2.status+" "+(await res2.text()));
-  return res2.json();
-}
+    $("btnHealth").onclick = async () => {
+      $("stateDot").textContent = "• Loading…";
+      try {
+        const r = await call("/health");
+        const t = await r.text();
+        log(`Health ${r.status}: ${t}`);
+      } catch (e) {
+        log("Health error: "+e);
+      } finally {
+        $("stateDot").textContent = "• Idle";
+      }
+    };
 
-function showQuote(q){
-  qPrice.textContent=q.price||"-";
-  qToken.textContent=`${q.tokenSymbol} (${fmtAddr(q.tokenAddress)})`;
-  qChain.textContent=q.chain||"-"; qTo.textContent=q.to||"-"; qNonce.textContent=q.nonce||"-"; qExp.textContent=q.expiry||"-";
-  payLog.textContent="Ready."; dlg.showModal();
-}
-$("btnCancel").onclick=()=>dlg.close();
+    $("btnProtected").onclick = async () => {
+      $("stateDot").textContent = "• Loading…";
+      try {
+        const r = await call($("endpoint").value);
+        const text = await r.text();
+        log(`Protected ${r.status}: ${text}`);
+        if (r.status === 402) {
+          lastHeaders = r.headers;
+          // isi modal
+          $("mPrice").textContent = r.headers.get("X-402-Amount") || "-";
+          $("mTo").textContent    = r.headers.get("X-402-To") || "-";
+          $("mNonce").textContent = r.headers.get("X-402-Nonce") || "-";
+          const exp = r.headers.get("X-402-Expires-At");
+          $("mExp").textContent   = exp ? new Date(Number(exp)).toLocaleString() : "-";
+          $("mLog").textContent   = "Ready.";
+          showModal();
+        }
+      } catch (e) {
+        log("Error: "+e);
+      } finally {
+        $("stateDot").textContent = "• Idle";
+      }
+    };
 
-function fmtAddr(a){ return a?a.slice(0,6)+"…"+a.slice(-4):"-"; }
-function logPay(m){ payLog.textContent+="\n"+m; }
+    $("btnCancel").onclick = hideModal;
 
-/* MetaMask ERC-20 transfer on Base */
-async function payWithMetaMask(q){
-  if(!window.ethereum) throw new Error("MetaMask not found");
-  const [account]=await ethereum.request({method:"eth_requestAccounts"});
+    let paying = false;
+    $("btnPay").onclick = async () => {
+      if (paying) return;
+      paying = true;
+      $("btnPay").disabled = true;
+      try {
+        if (!window.ethereum) throw new Error("MetaMask not found");
+        mlog("Requesting wallet…");
+        const accts = await ethereum.request({ method:"eth_requestAccounts" });
+        mlog("Wallet: "+accts[0]);
 
-  const baseHex="0x2105";
-  const chainId=await ethereum.request({method:"eth_chainId"});
-  if(chainId!==baseHex){
-    try{ await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:baseHex}]}); }
-    catch{ throw new Error("Please switch to Base (0x2105) in MetaMask."); }
-  }
+        // Switch ke Base
+        const base = "0x2105";
+        const cur = await ethereum.request({ method:"eth_chainId" });
+        if (cur !== base) {
+          try {
+            await ethereum.request({ method:"wallet_switchEthereumChain", params:[{ chainId: base }] });
+          } catch (err) {
+            if (err.code === 4902) {
+              await ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [{
+                  chainId: base,
+                  chainName: "Base",
+                  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+                  rpcUrls: ["https://mainnet.base.org"],
+                  blockExplorerUrls: ["https://basescan.org"]
+                }]
+              });
+            } else { throw err; }
+          }
+        }
 
-  const amountFloat=parseFloat((q.price||"0").split(" ")[0]||"0");
-  const amount=BigInt(Math.round(amountFloat*(10**q.decimals)));
+        const to    = lastHeaders.get("X-402-To");
+        const amt   = lastHeaders.get("X-402-Amount");
+        const nonce = lastHeaders.get("X-402-Nonce");
+        if (!to || !amt || !nonce) throw new Error("Incomplete 402 headers");
 
-  const data=encodeTransfer(q.to,amount.toString());
-  logPay("Sending transfer: "+amountFloat+" "+q.tokenSymbol);
-  const txHash=await ethereum.request({method:"eth_sendTransaction",params:[{from:account,to:q.tokenAddress,data}]});
-  logPay("Tx submitted: "+txHash+" — waiting for 1 confirmation…");
-  await waitReceipt(txHash); dlg.close(); return txHash;
-}
-function encodeTransfer(to,amountDec){ const sig="0xa9059cbb"; const to32=to.replace(/^0x/,"").padStart(64,"0"); const amtHex=BigInt(amountDec).toString(16).padStart(64,"0"); return sig+to32+amtHex; }
-async function waitReceipt(hash){ for(;;){ const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[hash]}); if(r&&r.status==="0x1") return; await new Promise(r=>setTimeout(r,1800)); } }
-</script>
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const usdc = new ethers.Contract(USDC, ERC20_ABI, signer);
+        const amount6 = ethers.parseUnits(amt, 6);
+
+        mlog(`Sending USDC ${amt} to ${to}…`);
+        const tx = await usdc.transfer(to, amount6);
+        mlog("Pending tx: "+tx.hash);
+        const rc = await tx.wait();
+        mlog("Confirmed in block "+rc.blockNumber);
+
+        // REDEEM
+        mlog("Redeeming…");
+        const redeemUrl = `/v1/alpha-signal/redeem?nonce=${encodeURIComponent(nonce)}&tx=${tx.hash}`;
+        const rr = await fetch(new URL(redeemUrl, apiBase.value));
+        const data = await rr.json();
+        mlog("Redeem response: "+JSON.stringify(data, null, 2));
+        if (rr.ok) {
+          alert("✅ Paid & redeemed! Check console area.");
+          hideModal();
+        } else {
+          alert("Redeem failed: "+(data.error||rr.status));
+        }
+      } catch (e) {
+        if (e.code === -32002) {
+          mlog("❌ MetaMask request already pending. Close existing pop-up and try again.");
+        } else {
+          mlog("❌ "+(e.message || e));
+        }
+      } finally {
+        paying = false;
+        $("btnPay").disabled = false;
+      }
+    };
+  </script>
 </body>
 </html>
