@@ -2,7 +2,7 @@ services:
   - type: web
     name: tnemyap
     env: docker
-    plan: starter
+    plan: free
     autoDeploy: true
     envVars:
       - key: NODE_ENV
@@ -31,10 +31,12 @@ services:
       - key: QUOTE_TTL_SEC
         value: 180
 
+  - type: redis
+    name: tnemyap-redis
+    plan: free
+    ipAllowList: []
+
 databases:
   - name: tnemyap-db
-    plan: starter
-
-redis:
-  - name: tnemyap-redis
-    plan: starter
+    plan: free
+    ipAllowList: []
