@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: tnemyap
+    env: docker
+    plan: starter
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tnemyap-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: tnemyap-redis
+          property: connectionString
+      - key: RPC_URL_BASE
+        value: https://mainnet.base.org
+      - key: EVM_TOKEN_ADDRESS_USDC
+        value: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+      - key: EVM_TOKEN_DECIMALS
+        value: 6
+      - key: EVM_TOKEN_SYMBOL
+        value: USDC
+      - key: MERCHANT_EVM
+        value: 0xYourReceiverAddr
+      - key: SERVER_SECRET
+        generateValue: true
+      - key: QUOTE_TTL_SEC
+        value: 180
+
+databases:
+  - name: tnemyap-db
+    plan: starter
+
+redis:
+  - name: tnemyap-redis
+    plan: starter
