@@ -1,7 +1,7 @@
 # Dockerfile
 FROM node:20-bookworm-slim
 
-# Tools untuk modul native (pg) + SSL
+# Tools untuk modul native & SSL
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     python3 build-essential pkg-config libpq-dev ca-certificates \
@@ -9,19 +9,17 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Salin manifest dulu untuk caching
+# Salin manifest
 COPY package.json package-lock.json* ./
 
-# 1-liner fallback: coba `npm ci`, kalau gagal (mis. lockfile tidak ada) → `npm install`
+# Install deps: coba npm ci (kalau ada lockfile), kalau gagal fallback ke npm install
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev || npm install --omit=dev
 
-# Salin sisa source
+# Salin source
 COPY . .
 
-# Jalankan di port Render
 ENV PORT=8080
 EXPOSE 8080
 
-# Start server
 CMD ["node", "src/server.js"]
