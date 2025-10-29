@@ -6,17 +6,12 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "NODE_ENV=development nodemon src/server.js",
-    "db:migrate": "psql \"$DATABASE_URL\" -f sql/001_init.sql"
+    "dev": "NODE_ENV=development nodemon src/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "ethers": "^6.13.2",
     "express": "^4.19.2",
-    "ioredis": "^5.4.1",
-    "pg": "^8.11.5",
-    "rate-limiter-flexible": "^5.0.3",
     "ulid": "^2.3.0"
   },
   "devDependencies": {
